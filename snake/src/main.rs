@@ -1,10 +1,7 @@
-use std::fmt::Debug;
 use nannou::prelude::*;
-use nannou::{event, rand};
+use nannou::{rand};
 use nannou::rand::Rng;
 use nannou::text::FontSize;
-use nannou::winit::event::VirtualKeyCode;
-use crate::wgpu::PolygonMode::Point;
 
 struct Model {
     main_window: WindowId,
@@ -54,7 +51,7 @@ impl Snake {
         }
 
         // Then update the head
-        let mut head = &mut self.pos[0];
+        let head = &mut self.pos[0];
         match self.direction {
             Direction::Up =>    { head.y += MOVEMENT_SPEED },
             Direction::Down =>  { head.y -= MOVEMENT_SPEED },
@@ -69,9 +66,9 @@ impl Snake {
         let y = (self.pos[0].y.abs()*2.) as u32;
         // Not sure why the math above doesn't work perfectly
         if x+(x/10) >= bounds.0 || y+(y/10) >= bounds.1 {
-            true
-        } else {
             false
+        } else {
+            true
         }
     }
 
@@ -100,11 +97,11 @@ impl Snake {
 impl Model {
     // Gets a random position in the bounds
     fn get_random_position(bounds: &(u32, u32)) -> Point2 {
-        let bounds = (bounds.0 as i32, bounds.1 as i32);
+        let bounds = (bounds.0 as i32 - 100, bounds.1 as i32 - 100);
         let mut rng = rand::thread_rng();
         let bls = BLOCK_SIZE as i32;
         // Maybe mapping the values would be a better way of doing this
-        let mut pos = Point2::new(rng.gen_range(-(bounds.0-bls)/2..(bounds.0-bls)/2) as f32,rng.gen_range(-(bounds.1-bls)/2..(bounds.1-bls)/2) as f32);
+        let mut pos = Point2::new(rng.gen_range(-(bounds.0-bls)/2..(bounds.0-bls)/2) as f32,rng.gen_range(-(bounds.1-bls)/2..(bounds.1-bls)/2) as f32 - 50.);
         let posx = pos.x as i32;
         let posy = pos.y as i32;
         if posx % bls !=0 {
@@ -115,7 +112,7 @@ impl Model {
         }
         pos
     }
-    fn randomise_food_position(&mut self,bounds: &(u32, u32)) {
+    fn randomise_food_position(&mut self, bounds: &(u32, u32)) {
         self.food_pos = Model::get_random_position(bounds);
     }
 }
@@ -148,7 +145,7 @@ fn model(_app: &App) -> Model {
     let mut pos = Vec::<Point2>::new();
     pos.push(Point2::new(0.,0.));
 
-    Model{ main_window, food_pos: Point2::new(32.,15.), snake: Snake { pos, direction: Direction::Right }, game_over: false }
+    Model{ main_window, food_pos: Point2::new(32.,16.), snake: Snake { pos, direction: Direction::Right }, game_over: false }
 }
 
 fn update(_app: &App, _model: &mut Model, _update: Update) {
@@ -165,7 +162,7 @@ fn update(_app: &App, _model: &mut Model, _update: Update) {
     // println!("bounds: {:?} pos: {}", bounds, _model.snake.pos[0] );
 
     _model.snake.update_position();
-    if _model.snake.is_self_collision() || _model.snake.is_head_in(&bounds) {
+    if _model.snake.is_self_collision() || !_model.snake.is_head_in(&bounds) {
         _model.game_over = true;
         return;
     }
