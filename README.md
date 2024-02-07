@@ -8,3 +8,4 @@ I really should do something so you don't have to recompile the same crates for 
 ![GIF of purple rain](showcase/purple_rain.gif)
 ![GIF of snake](showcase/snake.gif)
 ![GIF of starfield](showcase/starfield.gif)
+![GIF of mitosis](showcase/mitosis.gif)
